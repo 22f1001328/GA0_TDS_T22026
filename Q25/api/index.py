@@ -1,30 +1,34 @@
-from fastapi import FastAPI
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 import json
 import numpy as np
 from pathlib import Path
-from fastapi.responses import JSONResponse
 
 app = FastAPI()
+
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Expose-Headers": "Access-Control-Allow-Origin",
+}
+
+
 @app.middleware("http")
 async def add_cors_headers(request: Request, call_next):
     response = await call_next(request)
 
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "*"
+    for key, value in CORS_HEADERS.items():
+        response.headers[key] = value
 
     return response
+
 
 @app.options("/{path:path}")
 async def options_handler(path: str):
     return JSONResponse(
         content={},
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
-            "Access-Control-Allow-Headers": "*",
-        },
+        headers=CORS_HEADERS
     )
 
 
@@ -33,14 +37,15 @@ DATA_FILE = Path(__file__).parent.parent / "q-vercel-latency.json"
 with open(DATA_FILE, "r") as f:
     telemetry = json.load(f)
 
+
 @app.get("/")
 def health():
     return JSONResponse(
         content={"status": "ok"},
-        headers={
-            "Access-Control-Allow-Origin": "*"
-        }
+        headers=CORS_HEADERS
     )
+
+
 @app.post("/")
 @app.post("/api")
 @app.post("/api/")
@@ -74,8 +79,6 @@ def analytics(payload: dict):
         }
 
     return JSONResponse(
-    content=result,
-    headers={
-        "Access-Control-Allow-Origin": "*"
-    }
-)
+        content=result,
+        headers=CORS_HEADERS
+    )
