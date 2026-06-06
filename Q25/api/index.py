@@ -20,7 +20,15 @@ DATA_FILE = Path(__file__).parent.parent / "q-vercel-latency.json"
 with open(DATA_FILE, "r") as f:
     telemetry = json.load(f)
 
-
+@app.get("/")
+def health():
+    return JSONResponse(
+        content={"status": "ok"},
+        headers={
+            "Access-Control-Allow-Origin": "*"
+        }
+    )
+    
 @app.post("/")
 def analytics(payload: dict):
 
