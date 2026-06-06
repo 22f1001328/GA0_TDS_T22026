@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import json
 import numpy as np
 from pathlib import Path
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
@@ -48,4 +49,9 @@ def analytics(payload: dict):
             )
         }
 
-    return result
+    return JSONResponse(
+    content=result,
+    headers={
+        "Access-Control-Allow-Origin": "*"
+    }
+)
