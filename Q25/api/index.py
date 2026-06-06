@@ -51,12 +51,17 @@ def health():
 @app.post("/api/")
 @app.post("/api/latency")
 @app.post("/api/latency/")
+@app.post("/")
+@app.post("/api")
+@app.post("/api/")
+@app.post("/api/latency")
+@app.post("/api/latency/")
 def analytics(payload: dict):
 
     regions = payload["regions"]
     threshold = payload["threshold_ms"]
 
-    result = {}
+    result = []
 
     for region in regions:
 
@@ -68,7 +73,8 @@ def analytics(payload: dict):
         latencies = [r["latency_ms"] for r in records]
         uptimes = [r["uptime_pct"] for r in records]
 
-        result[region] = {
+        result.append({
+            "region": region,
             "avg_latency": round(sum(latencies) / len(latencies), 2),
             "p95_latency": round(float(np.percentile(latencies, 95)), 2),
             "avg_uptime": round(sum(uptimes) / len(uptimes), 2),
@@ -76,9 +82,9 @@ def analytics(payload: dict):
                 1 for x in latencies
                 if x > threshold
             )
-        }
+        })
 
     return JSONResponse(
-        content=result,
+        content={"regions": result},
         headers=CORS_HEADERS
     )
