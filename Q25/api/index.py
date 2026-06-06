@@ -29,7 +29,7 @@ def health():
         }
     )
     
-@app.post("/")
+@app.post("/api/latency")
 def analytics(payload: dict):
 
     regions = payload["regions"]
