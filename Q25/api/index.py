@@ -28,8 +28,11 @@ def health():
             "Access-Control-Allow-Origin": "*"
         }
     )
-    
+@app.post("/")
+@app.post("/api")
+@app.post("/api/")
 @app.post("/api/latency")
+@app.post("/api/latency/")
 def analytics(payload: dict):
 
     regions = payload["regions"]
